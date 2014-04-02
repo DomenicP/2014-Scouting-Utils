@@ -78,3 +78,6 @@ Icon
 .Spotlight-V100
 .Trashes
 
+# Project specific
+data/
+*.csv
