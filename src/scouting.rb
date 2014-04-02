@@ -2,21 +2,27 @@ require_relative 'tba'
 require 'CSV'
 require 'pry'
 
-EVENT = "2014mrcmp"
+# Prompt for event key
+print "Enter event code (default MRCMP): "
+input = gets.chomp
+if input.empty?
+  input = "mrcmp"
+end
+@event = "2014" + input.downcase
 
-# Get the list of teams attending MAR DCMP
-puts "Retrieving team list for #{EVENT}"
-@teams = TBA.get_event_teams EVENT
+# Get the list of teams attending the event
+puts "Retrieving team list for #{@event}"
+@teams = TBA.get_event_teams @event
 @teams.sort_by! { |t| t['team_number'] }
 
 # Retrive match data for the teams
-puts "Getting data for teams..."
+puts "Retrieving team data from TBA..."
 @data = @teams.map do |t|
   puts "Team #{t['team_number']}: #{t['nickname']}"
   TBA.get_team t['team_number']
 end
 
-CSV.open("data/#{EVENT}.csv", 'w') do |csv|
+CSV.open("data/#{@event}.csv", 'w') do |csv|
   # Header row
   csv << ['Team #', 'Name', 'Wins', 'Losses', 'Ties', 'Win/Loss Ratio', 'High Score (Q)', 'Average Score (Q)', 'High Score (E)', 'Average Score (E)', 'Awards']
   @data.each do |t|
@@ -69,12 +75,17 @@ CSV.open("data/#{EVENT}.csv", 'w') do |csv|
     row << (wins.to_f / losses.to_f).round(2)
     row << qual_scores.max
     row << ((qual_scores.inject(0) { |sum, score| sum += score }) / qual_scores.count)
-    row << elim_scores.max
-    row << ((elim_scores.inject(0) { |sum, score| sum += score }) / elim_scores.count)
-
+    if elim_scores.count > 0
+      row << elim_scores.max
+      row << ((elim_scores.inject(0) { |sum, score| sum += score }) / elim_scores.count)
+    else
+      row << 0
+      row << 0
+    end
     row << awards.join('; ')
     
     csv << row
   end
 end
 
+puts "Output written to 'data/#{@event}.csv'"
