@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'CSV'
 require 'json'
 require_relative 'tba'
