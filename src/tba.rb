@@ -1,9 +1,8 @@
 require 'net/http'
 require 'json'
-require 'pry'
 
 module TBA
-  X_TBA_APP_ID = 'domenic316:tba-ruby:1'
+  X_TBA_APP_ID = 'domenic316:tba-ruby:0.1'
   API_URL_BASE = 'http://www.thebluealliance.com/api/v2'
 
   def self.get_team(number, year = 2014)
