@@ -1,6 +1,8 @@
-require_relative 'tba'
 require 'CSV'
-require 'pry'
+require 'json'
+require_relative 'tba'
+
+CACHE_TEAM_DATA = true
 
 begin
   # Prompt for event key
@@ -13,7 +15,6 @@ begin
   puts "Retrieving team list for #{@event}"
   @teams = TBA.get_event_teams @event
   @teams.sort_by! { |t| t['team_number'] }
-
 rescue TBA::NotFoundError
   puts "Error: Invalid event code"
   retry
@@ -22,11 +23,27 @@ end
 # Retrive match data for the teams
 puts "Retrieving team data from TBA..."
 @data = @teams.map do |t|
-  puts "Team #{t['team_number']}: #{t['nickname']}"
-  TBA.get_team t['team_number']
+  if CACHE_TEAM_DATA
+    filename = "data/teams/#{t['team_number']}.json"
+
+    # Check if we already have data on a given team
+    if File.exists? filename
+      puts "Team #{t['team_number']}: #{t['nickname']} (Cached)"
+      data = JSON.parse File.read(filename)
+    else
+      # Fetch the data from TBA and save it for future use
+      puts "Team #{t['team_number']}: #{t['nickname']}"
+      data = TBA.get_team t['team_number']
+      File.write filename, data.to_json
+    end
+  else
+    puts "Team #{t['team_number']}: #{t['nickname']}"
+    data = TBA.get_team t['team_number']
+  end
+  data
 end
 
-CSV.open("data/#{@event}.csv", 'w') do |csv|
+CSV.open("data/events/#{@event}.csv", 'w') do |csv|
   # Header row
   csv << ['Team #', 'Name', 'Wins', 'Losses', 'Ties', 'Win/Loss Ratio', 'High Score (Q)', 'Average Score (Q)', 'High Score (E)', 'Average Score (E)', 'Awards']
   @data.each do |t|
@@ -92,4 +109,4 @@ CSV.open("data/#{@event}.csv", 'w') do |csv|
   end
 end
 
-puts "Output written to 'data/#{@event}.csv'"
+puts "Output written to 'data/events/#{@event}.csv'"
