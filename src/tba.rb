@@ -5,6 +5,8 @@ module TBA
   X_TBA_APP_ID = 'domenic316:tba-ruby:0.1'
   API_URL_BASE = 'http://www.thebluealliance.com/api/v2'
 
+  class NotFoundError < StandardError; end
+
   def self.get_team(number, year = 2014)
     make_request "/team/frc#{number}/#{year}"
   end
@@ -36,6 +38,8 @@ module TBA
 
     if res.is_a? Net::HTTPSuccess
       JSON.parse res.body
+    elsif res.is_a? Net::HTTPNotFound
+      raise NotFoundError
     else
       raise "Error: request returned response code #{res.code}"
     end

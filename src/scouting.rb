@@ -2,18 +2,22 @@ require_relative 'tba'
 require 'CSV'
 require 'pry'
 
-# Prompt for event key
-print "Enter event code (default MRCMP): "
-input = gets.chomp
-if input.empty?
-  input = "mrcmp"
-end
-@event = "2014" + input.downcase
+begin
+  # Prompt for event key
+  print "Enter event code (default MRCMP): "
+  input = gets.chomp
+  input = "mrcmp" if input.empty?
+  @event = "2014" + input.downcase
 
-# Get the list of teams attending the event
-puts "Retrieving team list for #{@event}"
-@teams = TBA.get_event_teams @event
-@teams.sort_by! { |t| t['team_number'] }
+  # Get the list of teams attending the event
+  puts "Retrieving team list for #{@event}"
+  @teams = TBA.get_event_teams @event
+  @teams.sort_by! { |t| t['team_number'] }
+
+rescue TBA::NotFoundError
+  puts "Error: Invalid event code"
+  retry
+end
 
 # Retrive match data for the teams
 puts "Retrieving team data from TBA..."
