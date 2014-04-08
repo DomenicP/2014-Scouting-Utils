@@ -1,4 +1,4 @@
-require 'tba'
+require 'scouting/tba'
 require 'minitest/autorun'
 
 class TestTBA < Minitest::Unit::TestCase
@@ -16,7 +16,7 @@ class TestTBA < Minitest::Unit::TestCase
   def test_get_event
     event = TBA.get_event "2014paphi"
     assert_equal event['short_name'], "Springside Chestnut Hill"
-    assert_raises(RuntimeError) { TBA.get_event "2014test"}
+    assert_raises(TBA::NotFoundError) { TBA.get_event "2014test"}
   end
 
   def test_get_event_teams

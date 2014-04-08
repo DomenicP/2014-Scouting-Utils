@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'open-uri'
 require 'nokogiri'
 require 'sequel'
@@ -64,6 +62,11 @@ module FRCSpy
     match_data.each { |m| DB[:matches].insert m }
   end
 
+  def self.update
+    setup_database
+    parse_xml URL
+  end
+  
   def self.matches_for_event(code)
     DB[:matches].where :event => code
   end

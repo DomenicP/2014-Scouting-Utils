@@ -1,9 +1,9 @@
 require 'rake/testtask'
 require 'rake/clean'
 
-CLEAN.include 'data/teams/*.json'
+CLEAN.include 'data/*'
 
 Rake::TestTask.new do |t|
-  t.libs << 'src'
-  t.libs << 'test'
+  t.libs << 'lib'
 end
+

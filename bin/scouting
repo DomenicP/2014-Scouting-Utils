@@ -2,7 +2,7 @@
 
 require 'CSV'
 require 'json'
-require_relative 'tba'
+require 'scouting'
 
 CACHE_TEAM_DATA = true
 
